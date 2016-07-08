@@ -15,6 +15,8 @@ class WamboInstaller extends LibraryInstaller
 {
 
     const PACKAGE_TYPE = 'wambo-module';
+    const AUTOLOAD_TYPE = 'PSR-4';
+
 
     const MODULES_JSON_PATH = 'config/wambo/modules.json';
 
@@ -41,31 +43,27 @@ class WamboInstaller extends LibraryInstaller
         echo 'add  ' . $package->getName() . ' to wambo modules';
         echo PHP_EOL;
 
-        $autoload = $package->getAutoload();
-        if(array_key_exists('psr-4', $autoload)){
-            $namespaces = array_keys($autoload['psr-4']);
-            if(!empty($namespaces)){
-                $namespace_parts = array_filter(preg_split('/\\\\/', array_pop($namespaces)));
-                $module_classname = $namespace_parts[count($namespace_parts) -1];
+        $wamboInstallerService = new WamboInstallerService($package);
+        $namespace = $wamboInstallerService->getAutoloadNamespace();
 
-                if( file_exists(self::MODULES_JSON_PATH) ){
-                    $modules_json = file_get_contents(self::MODULES_JSON_PATH);
-                    $modules = json_decode($modules_json, true);
-                }else{
-                    $modules = array();
-                }
+        $namespace_parts = array_filter(preg_split('/\\\\/', array_pop($namespace)));
+        $module_classname = $namespace_parts[count($namespace_parts) -1];
 
-
-                $module_entity = array(
-                    'name' => $module_classname,
-                    'namespace' => implode('\\', $namespace_parts)
-                );
-                array_push($modules, $module_entity);
-
-                $modules = array_unique($modules, SORT_REGULAR);
-                file_put_contents(self::MODULES_JSON_PATH, json_encode($modules, JSON_PRETTY_PRINT));
-            }
+        $modules = array();
+        if (file_exists(self::MODULES_JSON_PATH)) {
+            $modules_json = file_get_contents(self::MODULES_JSON_PATH);
+            $modules = json_decode($modules_json, true);
         }
+
+        $module_entity = array(
+            'name' => $module_classname,
+            'namespace' => implode('\\', $namespace_parts)
+        );
+        array_push($modules, $module_entity);
+
+        $modules = array_unique($modules, SORT_REGULAR);
+        file_put_contents(self::MODULES_JSON_PATH, json_encode($modules, JSON_PRETTY_PRINT));
+
 
         parent::install($repo, $package);
     }
