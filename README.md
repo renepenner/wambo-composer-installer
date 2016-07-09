@@ -8,3 +8,23 @@
 
 A composer plugin to install wambo modules to a wambo project.
 
+## How to use
+
+to install a module to a wambo project you can use a this installer. The installer checkes
+the composer type and the autoload PSR-4 namespace.
+
+```json
+{
+  "type": "wambo-module",
+}
+```
+
+```json
+{
+ "autoload": {
+    "psr-4": {
+      "My\\Namespace\\": "src/My/Namespace/"
+    }
+  },
+}
+```
