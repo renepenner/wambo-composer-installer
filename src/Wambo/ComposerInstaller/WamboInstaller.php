@@ -4,6 +4,12 @@ namespace Wambo\ComposerInstaller;
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use Wambo\Core\Module\JSONModuleStorage;
+use Wambo\Core\Module\Module;
+use Wambo\Core\Module\ModuleMapper;
+use Wambo\Core\Module\ModuleRepository;
 
 /**
  * WamboInstaller is an composer installer to add a "wambo-module" to a
@@ -15,10 +21,10 @@ class WamboInstaller extends LibraryInstaller
 {
 
     const PACKAGE_TYPE = 'wambo-module';
-    const AUTOLOAD_TYPE = 'PSR-4';
+    const AUTOLOAD_TYPE = 'psr-4';
 
+    private $moduleRepository;
 
-    const MODULES_JSON_PATH = 'config/wambo/modules.json';
 
     /**
      * Decides if the installer supports the given type
@@ -39,32 +45,31 @@ class WamboInstaller extends LibraryInstaller
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+        $filesystemAdapter = new Local($this->vendorDir);
+        $filesystem = new Filesystem($filesystemAdapter);
+        $mapper = new ModuleMapper();
+        $storage = new JSONModuleStorage($filesystem, 'modules.json');
+
+        $this->moduleRepository = new ModuleRepository($storage, $mapper);
+
         // display info on "composer update" on command line
         echo 'add  ' . $package->getName() . ' to wambo modules';
         echo PHP_EOL;
 
-/*
         $wamboInstallerService = new WamboInstallerService($package);
         $namespace = $wamboInstallerService->getAutoloadNamespace();
 
-        $namespace_parts = array_filter(preg_split('/\\\\/', array_pop($namespace)));
+        $namespace_parts = array_filter(preg_split('/\\\\/', $namespace));
         $module_classname = $namespace_parts[count($namespace_parts) -1];
-
-        $modules = array();
-        if (file_exists(self::MODULES_JSON_PATH)) {
-            $modules_json = file_get_contents(self::MODULES_JSON_PATH);
-            $modules = json_decode($modules_json, true);
-        }
 
         $module_entity = array(
             'name' => $module_classname,
             'namespace' => implode('\\', $namespace_parts)
         );
-        array_push($modules, $module_entity);
 
-        $modules = array_unique($modules, SORT_REGULAR);
-        file_put_contents(self::MODULES_JSON_PATH, json_encode($modules, JSON_PRETTY_PRINT));
-*/
+        $module = new Module($module_entity['namespace'], $module_entity['name']);
+
+        $this->moduleRepository->add($module);
 
         parent::install($repo, $package);
     }
