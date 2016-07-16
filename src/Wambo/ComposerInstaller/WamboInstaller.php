@@ -24,8 +24,9 @@ class WamboInstaller extends LibraryInstaller
     const EXTRA_BOOTSTRAP_CLASS_KEY = 'class';
     const AUTOLOAD_TYPE = 'psr-4';
 
-    private $moduleRepository;
+    const MODULES_JSON_FILENAME = 'modules.json';
 
+    private $moduleRepository;
 
     /**
      * Decides if the installer supports the given type
@@ -46,32 +47,31 @@ class WamboInstaller extends LibraryInstaller
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        $filesystemAdapter = new Local($this->vendorDir);
-        $filesystem = new Filesystem($filesystemAdapter);
-        $mapper = new ModuleMapper();
-        $storage = new JSONModuleStorage($filesystem, 'modules.json');
-
-        $this->moduleRepository = new ModuleRepository($storage, $mapper);
+        $this->bootstrap();
 
         // display info on "composer update" on command line
         echo 'add  ' . $package->getName() . ' to wambo modules';
         echo PHP_EOL;
 
         $wamboInstallerService = new WamboInstallerService($package);
-        $namespace = $wamboInstallerService->getAutoloadNamespace();
 
-        $namespace_parts = array_filter(preg_split('/\\\\/', $namespace));
-        $module_classname = $namespace_parts[count($namespace_parts) -1];
+        $className = $wamboInstallerService->getBootstrapClassName();
+        $name = $package->getName();
+        $version = $package->getVersion();
 
-        $module_entity = array(
-            'name' => $module_classname,
-            'namespace' => implode('\\', $namespace_parts)
-        );
-
-        $module = new Module($module_entity['namespace'], $module_entity['name']);
-
+        $module = new Module($name, $version, $className);
         $this->moduleRepository->add($module);
 
         parent::install($repo, $package);
+    }
+
+    private function bootstrap()
+    {
+        $filesystemAdapter = new Local($this->vendorDir);
+        $filesystem = new Filesystem($filesystemAdapter);
+        $mapper = new ModuleMapper();
+        $storage = new JSONModuleStorage($filesystem, self::MODULES_JSON_FILENAME);
+
+        $this->moduleRepository = new ModuleRepository($storage, $mapper);
     }
 }
