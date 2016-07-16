@@ -21,6 +21,7 @@ class WamboInstaller extends LibraryInstaller
 {
 
     const PACKAGE_TYPE = 'wambo-module';
+    const EXTRA_BOOTSTRAP_CLASS_KEY = 'class';
     const AUTOLOAD_TYPE = 'psr-4';
 
     private $moduleRepository;

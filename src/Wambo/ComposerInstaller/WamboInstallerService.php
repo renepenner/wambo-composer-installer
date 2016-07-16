@@ -3,6 +3,8 @@
 namespace Wambo\ComposerInstaller;
 
 use Composer\Package\PackageInterface;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Wambo\ComposerInstaller\Exception\InvalidArgumentException;
 
 class WamboInstallerService
 {
@@ -20,6 +22,7 @@ class WamboInstallerService
 
     /**
      * @return string
+     * @throws \Exception
      */
     public function getAutoloadNamespace()
     {
@@ -37,5 +40,19 @@ class WamboInstallerService
         }
 
         return $namespace_array[0];
+    }
+
+    /**
+     * @return string
+     */
+    public function getBootstrapClassName() : string
+    {
+        $extra = $this->package->getExtra();
+
+        if(!array_key_exists(WamboInstaller::EXTRA_BOOTSTRAP_CLASS_KEY, $extra)){
+            throw new InvalidArgumentException('Wambo bootstap class not found');
+        }
+
+        return $extra[WamboInstaller::EXTRA_BOOTSTRAP_CLASS_KEY];
     }
 }
