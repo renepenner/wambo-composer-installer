@@ -43,6 +43,7 @@ class WamboInstaller extends LibraryInstaller
         echo 'add  ' . $package->getName() . ' to wambo modules';
         echo PHP_EOL;
 
+/*
         $wamboInstallerService = new WamboInstallerService($package);
         $namespace = $wamboInstallerService->getAutoloadNamespace();
 
@@ -63,7 +64,7 @@ class WamboInstaller extends LibraryInstaller
 
         $modules = array_unique($modules, SORT_REGULAR);
         file_put_contents(self::MODULES_JSON_PATH, json_encode($modules, JSON_PRETTY_PRINT));
-
+*/
 
         parent::install($repo, $package);
     }
