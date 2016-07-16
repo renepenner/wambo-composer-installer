@@ -16,7 +16,7 @@ class WamboInstallerServiceTest extends TestCase
         // arrange
         $package = $this->getMockBuilder(PackageInterface::class)->getMock();
         $package->method('getAutoload')->willReturn(
-            array('PSR-4' => array(
+            array('psr-4' => array(
                 '\\Wambo\\SomePackage' => 'src/Wambo/SomePackage'
             ))
         );
