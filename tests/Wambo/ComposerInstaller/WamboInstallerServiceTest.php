@@ -6,6 +6,11 @@ use Composer\Package\PackageInterface;
 use PHPUnit\Framework\TestCase;
 use Wambo\ComposerInstaller\Exception\InvalidArgumentException;
 
+/**
+ * Class WamboInstallerServiceTest
+ *
+ * @package Wambo\ComposerInstaller
+ */
 class WamboInstallerServiceTest extends TestCase
 {
 
@@ -15,11 +20,12 @@ class WamboInstallerServiceTest extends TestCase
     public function testGetBootstrapClass_Success()
     {
         // arrange
-        /** @var PackageInterface $package */
         $package = $this->getMockBuilder(PackageInterface::class)->getMock();
         $package->method('getExtra')->willReturn(
             array(WamboInstaller::EXTRA_BOOTSTRAP_CLASS_KEY => 'Wambo\\Test\\Bootstrap')
         );
+
+        /** @var PackageInterface $package */
         $wamboInstallerService = new WamboInstallerService($package);
 
         //act
@@ -62,6 +68,8 @@ class WamboInstallerServiceTest extends TestCase
                 '\\Wambo\\SomePackage' => 'src/Wambo/SomePackage'
             ))
         );
+
+        /** @var PackageInterface $package */
         $wamboInstallerService = new WamboInstallerService($package);
 
         //act
@@ -85,6 +93,8 @@ class WamboInstallerServiceTest extends TestCase
                 '\\Wambo\\OtherPackage' => 'src/Wambo/OtherPackage'
             ))
         );
+
+        /** @var PackageInterface $package */
         $wamboInstallerService = new WamboInstallerService($package);
 
         //act
@@ -103,6 +113,8 @@ class WamboInstallerServiceTest extends TestCase
             array('PSR-4' => array(
             ))
         );
+
+        /** @var PackageInterface $package */
         $wamboInstallerService = new WamboInstallerService($package);
 
         //act

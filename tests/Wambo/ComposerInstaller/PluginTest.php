@@ -25,4 +25,6 @@ class PluginTest extends TestCase
         $this->assertInstanceOf(__NAMESPACE__ . '\\Plugin', $plugin);
         $this->assertInstanceOf('Composer\\Plugin\\PluginInterface', $plugin);
     }
+
+
 }
