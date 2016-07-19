@@ -17,8 +17,8 @@ composer require wambo/wambo-composer-installer
 
 ## Usage
 
-to install a module to a wambo project you can use a this installer. The installer checkes
-the composer type and the autoload PSR-4 namespace.
+to install a module to a wambo project you can use a this installer. The installer get "extra -> class" from
+composer.json and add them a json file: `vendor/modules.json`.
 
 ```json
 {
@@ -27,11 +27,12 @@ the composer type and the autoload PSR-4 namespace.
 ```
 
 ```json
-{
- "autoload": {
+  "extra": {
+    "class": "Wambo\\Test\\Test"
+  },
+  "autoload": {
     "psr-4": {
-      "My\\Namespace\\": "src/My/Namespace/"
+      "Wambo\\Test\\": "src/Wambo/Test/"
     }
   },
-}
 ```
